@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Pixel Canvas with Black Trail</title>
+    <title>Interactive Pixel Color Canvas</title>
     <style>
         * {
             margin: 0;
@@ -18,7 +18,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            font-family: 'Arial', sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
         .container {
@@ -28,7 +28,6 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            position: relative;
         }
         
         .title {
@@ -38,16 +37,14 @@
             font-weight: 300;
             letter-spacing: 2px;
             z-index: 10;
-            background-color: rgba(0, 0, 0, 0.7);
+            background-color: rgba(0, 0, 0, 0.5);
             padding: 10px 20px;
             border-radius: 10px;
-            position: absolute;
-            top: 20px;
         }
         
         .canvas {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(10px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(8px, 1fr));
             width: 100%;
             height: 100%;
             gap: 0;
@@ -56,7 +53,7 @@
         .pixel {
             width: 100%;
             height: 100%;
-            transition: background-color 2s ease;
+            transition: background-color 0.3s ease;
         }
         
         .instructions {
@@ -64,54 +61,24 @@
             bottom: 20px;
             color: white;
             text-align: center;
-            background-color: rgba(0, 0, 0, 0.7);
+            background-color: rgba(0, 0, 0, 0.5);
             padding: 10px 20px;
             border-radius: 10px;
             z-index: 10;
-        }
-        
-        .controls {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 10;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        
-        button {
-            background-color: rgba(0, 0, 0, 0.7);
-            color: white;
-            border: 1px solid white;
-            padding: 8px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        button:hover {
-            background-color: rgba(255, 255, 255, 0.2);
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1 class="title">Interactive Pixel Canvas</h1>
+        <h1 class="title">Interactive Pixel Color Canvas</h1>
         <div class="canvas" id="canvas"></div>
-        <div class="instructions">Move your mouse to create a black trail that fades after 2 seconds</div>
-        <div class="controls">
-            <button id="resetBtn">Reset Canvas</button>
-            <button id="randomizeBtn">Randomize Colors</button>
-        </div>
+        <div class="instructions">Move your mouse to create colorful patterns</div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const canvas = document.getElementById('canvas');
-            const resetBtn = document.getElementById('resetBtn');
-            const randomizeBtn = document.getElementById('randomizeBtn');
-            const pixelSize = 10; // Size of each pixel in pixels
+            const pixelSize = 8; // Size of each pixel in pixels
             
             // Calculate how many pixels we need to fill the screen
             const screenWidth = window.innerWidth;
@@ -123,31 +90,17 @@
             // Set grid template columns
             canvas.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
             
-            // Store original colors for each pixel
-            const originalColors = [];
-            
             // Create pixels
             for (let i = 0; i < cols * rows; i++) {
                 const pixel = document.createElement('div');
                 pixel.className = 'pixel';
                 
                 // Set initial random color
-                const originalColor = getRandomColor();
-                pixel.style.backgroundColor = originalColor;
-                originalColors[i] = originalColor;
+                pixel.style.backgroundColor = getRandomColor();
                 
                 // Add hover effect
-                pixel.addEventListener('mouseenter', function() {
-                    this.style.backgroundColor = '#000000';
-                    this.style.transition = 'background-color 0s'; // Immediate change
-                });
-                
-                pixel.addEventListener('mouseleave', function() {
-                    // After 2 seconds, fade back to original color
-                    setTimeout(() => {
-                        this.style.transition = 'background-color 2s ease';
-                        this.style.backgroundColor = originalColors[i];
-                    }, 2000);
+                pixel.addEventListener('mouseover', function() {
+                    this.style.backgroundColor = getRandomColor();
                 });
                 
                 canvas.appendChild(pixel);
@@ -156,33 +109,15 @@
             // Function to generate random colors
             function getRandomColor() {
                 const hue = Math.floor(Math.random() * 360);
-                const saturation = Math.floor(Math.random() * 50) + 50; // 50-100%
-                const lightness = Math.floor(Math.random() * 40) + 30; // 30-70%
+                const saturation = Math.floor(Math.random() * 30) + 70; // 70-100%
+                const lightness = Math.floor(Math.random() * 30) + 50; // 50-80%
                 return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
             }
             
-            // Reset button functionality
-            resetBtn.addEventListener('click', function() {
-                const pixels = document.querySelectorAll('.pixel');
-                pixels.forEach((pixel, index) => {
-                    pixel.style.transition = 'background-color 1s ease';
-                    pixel.style.backgroundColor = originalColors[index];
-                });
-            });
-            
-            // Randomize colors button functionality
-            randomizeBtn.addEventListener('click', function() {
-                const pixels = document.querySelectorAll('.pixel');
-                pixels.forEach((pixel, index) => {
-                    const newColor = getRandomColor();
-                    pixel.style.transition = 'background-color 1s ease';
-                    pixel.style.backgroundColor = newColor;
-                    originalColors[index] = newColor;
-                });
-            });
-            
             // Handle window resize
             window.addEventListener('resize', function() {
+                // In a real implementation, you would recalculate and redraw the grid
+                // For simplicity, we'll just reload the page
                 location.reload();
             });
         });
